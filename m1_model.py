@@ -38,8 +38,8 @@ X_train, y_train = train_df[features], train_df[target]
 X_test, y_test = test_df[features], test_df[target]
 X_validation, y_validation = validation_df[features], validation_df[target]
 
-# Load the scaler used during training
-scaler = StandardScaler()  # Initialize a new scaler
+# Normalize numerical features
+scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 X_validation_scaled = scaler.transform(X_validation)
@@ -53,7 +53,7 @@ X_validation_lstm = X_validation_scaled.reshape(
     (X_validation_scaled.shape[0], 1, X_validation_scaled.shape[1]))
 
 model.compile(optimizer='adam', loss='mean_squared_error')
-model.fit(X_train_lstm, y_train, epochs=50, batch_size=32, verbose=2)
+model.fit(X_train_lstm, y_train, epochs=150, batch_size=32, verbose=2)
 
 # Make predictions for the validation set
 predictions_validation_lstm = model.predict(X_validation_lstm)

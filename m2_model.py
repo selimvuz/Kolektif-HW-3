@@ -38,8 +38,8 @@ X_train, y_train = train_df[features], train_df[target]
 X_test, y_test = test_df[features], test_df[target]
 X_validation, y_validation = validation_df[features], validation_df[target]
 
-# Load the scaler used during training
-scaler = StandardScaler()  # Initialize a new scaler
+# Normalize numerical features
+scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 X_validation_scaled = scaler.transform(X_validation)

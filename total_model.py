@@ -53,14 +53,14 @@ X_validation_lstm = X_validation_scaled.reshape(
 
 # Build and train the LSTM model using TensorFlow/Keras
 model_lstm = tf.keras.Sequential([
-    tf.keras.layers.LSTM(64, activation='relu',
-                         input_shape=(1, X_train_scaled.shape[1])),
+    tf.keras.layers.LSTM(16, activation='relu',
+                         input_shape=(1, X_train.shape[1])),
     tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dense(1)  # Output layer for regression
 ])
 
 model_lstm.compile(optimizer='adam', loss='mean_squared_error')
-model_lstm.fit(X_train_lstm, y_train, epochs=100, batch_size=32, verbose=2)
+model_lstm.fit(X_train_lstm, y_train, epochs=150, batch_size=32, verbose=2)
 
 # Make predictions for the validation set
 predictions_validation_lstm = model_lstm.predict(X_validation_lstm)
