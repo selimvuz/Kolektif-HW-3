@@ -5,7 +5,7 @@ from keras.callbacks import EarlyStopping
 import pandas as pd
 
 # Replace with your actual file paths
-train_path = 'Data/M2.csv'
+train_path = 'Data/M0.csv'
 valid_path = 'Data/Valid.csv'
 test_path = 'Data/Test.csv'
 
@@ -58,4 +58,4 @@ test_loss, test_acc = model.evaluate(test_padded, test_labels)
 print('Test accuracy:', test_acc)
 
 # Save the model
-model.save('M2_model')
+model.save('M0_model')

@@ -29,44 +29,45 @@ test_labels = test_data['label'].values
 save_dir = 'extrapolated_models'
 os.makedirs(save_dir, exist_ok=True)
 
-# Function to interpolate between two sets of weights
 
-
-def interpolate_weights(weights1, weights2, alpha):
+def extrapolate_weights(weights1, weights2, alpha):
     return [(1 - alpha) * w1 + alpha * w2 for w1, w2 in zip(weights1, weights2)]
 
 
-# Create and evaluate interpolated models
-num_interpolations = 200
+# Choose extrapolation factors outside the range [0, 1]
+extrapolation_factors = [-3.0, -2.5, -2.0, -1.5, -
+                         1, -0.5, 1.5, 2.0, 2.5, 3.0]  # Example factors
+
+
 performance = []
 
-for i in range(num_interpolations + 1):
-    alpha = i / num_interpolations
+for alpha in extrapolation_factors:
+    extrapolated_weights = []
 
     # Interpolate weights for each layer
-    interpolated_weights = []
+    extrapolated_weights = []
     for layer_index in range(len(model_M1.layers)):
         weights_M1 = model_M1.layers[layer_index].get_weights()
         weights_M2 = model_M2.layers[layer_index].get_weights()
 
         if weights_M1 and weights_M2:  # If the layer has weights
-            interpolated_weights.append(
-                interpolate_weights(weights_M1, weights_M2, alpha))
+            extrapolated_weights.append(
+                extrapolate_weights(weights_M1, weights_M2, alpha))
 
     # Create a new model with the same architecture and set interpolated weights
-    interpolated_model = tf.keras.models.clone_model(model_M1)
-    interpolated_model.set_weights(
-        [w for layer_weights in interpolated_weights for w in layer_weights])
-    interpolated_model.compile(
+    extrapolated_model = tf.keras.models.clone_model(model_M1)
+    extrapolated_model.set_weights(
+        [w for layer_weights in extrapolated_weights for w in layer_weights])
+    extrapolated_model.compile(
         optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     # Save each interpolated model
     model_save_path = os.path.join(
-        save_dir, f'interpolated_model_alpha_{alpha:.2f}')
-    interpolated_model.save(model_save_path)
+        save_dir, f'extrapolated_model_alpha_{alpha:.2f}')
+    extrapolated_model.save(model_save_path)
 
     # Evaluate the model (assuming test data is available as test_padded and test_labels)
-    loss, acc = interpolated_model.evaluate(
+    loss, acc = extrapolated_model.evaluate(
         test_padded, test_labels, verbose=0)
     performance.append((alpha, loss, acc))
 
