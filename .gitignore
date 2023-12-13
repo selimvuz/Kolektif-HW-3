@@ -1,5 +1,8 @@
 /Data/
 /__pycache__/
 *.npy
-*_model
 *_models
+M0_model
+M1_model
+M2_model
+M3_model
