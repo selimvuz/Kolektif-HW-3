@@ -3,6 +3,12 @@ from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.callbacks import EarlyStopping
 import pandas as pd
+from keras.regularizers import l2
+import pickle
+import random
+
+random.seed(42)
+tf.random.set_seed(42)
 
 # Replace with your actual file paths
 train_path = 'Data/M1.csv'
@@ -35,12 +41,11 @@ train_labels = train_data['label'].values
 valid_labels = valid_data['label'].values
 test_labels = test_data['label'].values
 
+
 model = tf.keras.Sequential([
     tf.keras.layers.Embedding(100000, 16, input_length=max_length),
-    tf.keras.layers.Dropout(0.5),  # Dropout after embedding
-    tf.keras.layers.SimpleRNN(32),
-    tf.keras.layers.Dropout(0.5),  # Dropout before the output layer
-    tf.keras.layers.Dense(1, activation='sigmoid')
+    tf.keras.layers.SimpleRNN(4, kernel_regularizer=l2(0.02)),
+    tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=l2(0.02))
 ])
 
 optimizer = tf.keras.optimizers.Adam(
@@ -48,10 +53,10 @@ optimizer = tf.keras.optimizers.Adam(
 model.compile(optimizer=optimizer, loss='binary_crossentropy',
               metrics=['accuracy'])
 
-batch_size = 64  # Set your batch size here
+batch_size = 32  # Set your batch size here
 
 early_stop = EarlyStopping(monitor='val_loss', patience=3)
-model.fit(train_padded, train_labels, batch_size=batch_size, epochs=10, validation_data=(
+model.fit(train_padded, train_labels, batch_size=batch_size, epochs=5, validation_data=(
     valid_padded, valid_labels), callbacks=[early_stop])
 
 test_loss, test_acc = model.evaluate(test_padded, test_labels)
@@ -59,3 +64,7 @@ print('Test accuracy:', test_acc)
 
 # Save the model
 model.save('M1_model')
+
+# Save the tokenizer
+with open('final_tokenizerM1.pickle', 'wb') as handle:
+    pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)

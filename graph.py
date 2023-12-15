@@ -1,25 +1,42 @@
-import numpy as np
+from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
+import numpy as np
 
-# Updated alpha and loss values for the extended extrapolation range
-alphas_updated = np.array(
-    [-3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 1.5, 2.0, 2.5, 3.0])
-losses_updated = np.array(
-    [4.2752, 3.8003, 3.0518, 2.3981, 1.8041, 1.2576, 1.2953, 1.4491, 1.9936, 2.6900])
+# Data from the user
+data = [
+    {"alpha": -3.0, "loss": 0.6305, "accuracy": 0.7420},
+    {"alpha": -2.5, "loss": 0.6343, "accuracy": 0.7406},
+    {"alpha": -2.0, "loss": 0.6378, "accuracy": 0.7354},
+    {"alpha": -1.5, "loss": 0.6383, "accuracy": 0.7382},
+    {"alpha": -1.0, "loss": 0.6356, "accuracy": 0.7438},
+    {"alpha": -0.5, "loss": 0.6320, "accuracy": 0.7480},
+    {"alpha": 1.5, "loss": 0.6296, "accuracy": 0.7530},
+    {"alpha": 2.0, "loss": 0.6315, "accuracy": 0.7500},
+    {"alpha": 2.5, "loss": 0.6302, "accuracy": 0.7506},
+    {"alpha": 3.0, "loss": 0.6266, "accuracy": 0.7558}
+]
 
-# Creating the updated line graph
-plt.figure(figsize=(10, 6))
-plt.plot(alphas_updated, losses_updated,
-         marker='o', color='black', linestyle='-')
+# Extracting alpha, loss, and accuracy
+alphas = [d['alpha'] for d in data]
+losses = [d['loss'] for d in data]
+accuracies = [d['accuracy'] for d in data]
 
-# Highlighting the interpolation range (0 to 1)
-plt.axvline(x=0, color='gray', linestyle='--', linewidth=1)
-plt.axvline(x=1, color='gray', linestyle='--', linewidth=1)
-plt.fill_betweenx([min(losses_updated), max(losses_updated)],
-                  0, 1, color='gray', alpha=0.2)
 
-plt.title('Alpha ile Loss değişimi (Ekstrapolasyon)')
+# Creating a grid on which to interpolate
+grid_x, grid_y = np.meshgrid(np.linspace(min(alphas), max(
+    alphas), 100), np.linspace(min(accuracies), max(accuracies), 100))
+
+# Interpolating the loss values on the grid
+grid_z = griddata((alphas, accuracies), losses,
+                  (grid_x, grid_y), method='cubic')
+
+# Creating the contour plot
+plt.figure(figsize=(8, 6))
+cp = plt.contourf(grid_x, grid_y, grid_z, levels=15, cmap='viridis')
+plt.colorbar(cp)  # Add a colorbar to a plot
+plt.scatter(alphas, accuracies, color='red')  # Plot the actual data points
+plt.title('Ekstrapolasyonda Doğruluk ve Kayıp Değerleri')
 plt.xlabel('Alpha')
-plt.ylabel('Loss')
+plt.ylabel('Accuracy')
 plt.grid(True)
 plt.show()

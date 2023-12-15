@@ -1,14 +1,15 @@
-import pandas as pd
+import tensorflow as tf
 
-# Load your dataset
-df = pd.read_csv('Data/Train.csv')  # Replace with your file path
+model = tf.keras.models.load_model('M1_model')
 
-# Assuming 'text' is the column containing the text data
-word_lengths = df['text'].str.split().apply(len)
+# Initialize the count
+total_weights = 0
 
-# Calculate minimum and maximum word count
-min_word_count = word_lengths.min()
-max_word_count = word_lengths.max()
+# Iterate through each layer
+for layer in model.layers:
+    layer_weights = layer.get_weights()  # List of numpy arrays
+    # Sum sizes of all weight arrays in the layer
+    num_weights = sum([w.size for w in layer_weights])
+    total_weights += num_weights
 
-print("Minimum word count:", min_word_count)
-print("Maximum word count:", max_word_count)
+print(f"Total number of weights in the model: {total_weights}")

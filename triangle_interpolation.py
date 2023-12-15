@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
+import pickle
 
 # Load the original models
 model_M0 = tf.keras.models.load_model('M0_model')
@@ -17,9 +18,9 @@ test_path = 'Data/Test.csv'
 train_data = pd.read_csv(train_path)
 test_data = pd.read_csv(test_path)
 
-# Tokenization
-tokenizer = Tokenizer(num_words=100000, oov_token="<OOV>")
-tokenizer.fit_on_texts(train_data['text'])
+# Load both tokenizers
+with open('final_tokenizerM1.pickle', 'rb') as handle:
+    tokenizer = pickle.load(handle)
 
 test_sequences = tokenizer.texts_to_sequences(test_data['text'])
 test_padded = pad_sequences(
